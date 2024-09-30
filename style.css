@@ -9,10 +9,15 @@ main{
 main > img{
     width: 560px;
     height: 320px;
+    margin: 10px;
 }
 
 main > h1{
     margin: 0;
     font-style: italic;
     font-size: 50px;
+}
+
+main > #timezone{
+    margin: 10px;
 }
