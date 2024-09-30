@@ -10,10 +10,11 @@ main > img{
     width: 560px;
     height: 320px;
     margin: 10px;
+    object-fit: cover;
 }
 
 main > h1{
-    margin: 0;
+    margin: 10px;
     font-style: italic;
     font-size: 50px;
 }
