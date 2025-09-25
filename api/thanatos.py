@@ -1,4 +1,5 @@
 import os
+import json
 from openai import OpenAI
 from pinecone import Pinecone
 
@@ -42,7 +43,10 @@ def handler(request):
         data = json.loads(request.body.decode())
         query = data.get("question", "")
         if not query:
-            return {"error": "Missing 'question' field"}
-        return {"answer": answer_query(query)}
+            return (json.dumps({"error": "Missing 'question' field"}), 400, {"Content-Type": "application/json"})
+        
+        answer = answer_query(query)
+        return (json.dumps({"answer": answer}), 200, {"Content-Type": "application/json"})
+    
     except Exception as e:
-        return {"error": str(e)}
+        return (json.dumps({"error": str(e)}), 500, {"Content-Type": "application/json"})
