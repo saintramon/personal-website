@@ -1,2 +1,2 @@
 openai
-pinecone-client
+pinecone
