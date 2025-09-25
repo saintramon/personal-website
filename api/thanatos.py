@@ -42,11 +42,24 @@ def handler(request):
     try:
         data = json.loads(request.body.decode())
         query = data.get("question", "")
+
         if not query:
-            return (json.dumps({"error": "Missing 'question' field"}), 400, {"Content-Type": "application/json"})
-        
+            return {
+                "statusCode": 400,
+                "headers": {"Content-Type": "application/json"},
+                "body": json.dumps({"error": "Missing 'question' field"})
+            }
+
         answer = answer_query(query)
-        return (json.dumps({"answer": answer}), 200, {"Content-Type": "application/json"})
-    
+        return {
+            "statusCode": 200,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({"answer": answer})
+        }
+
     except Exception as e:
-        return (json.dumps({"error": str(e)}), 500, {"Content-Type": "application/json"})
+        return {
+            "statusCode": 500,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({"error": str(e)})
+        }
