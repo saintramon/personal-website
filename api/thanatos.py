@@ -1,7 +1,13 @@
 import os
-import json
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from openai import OpenAI
 from pinecone import Pinecone
+
+class AskRequest(BaseModel):
+    question: str
+
+app = FastAPI()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
@@ -10,7 +16,7 @@ index = pc.Index(host=os.getenv("PINECONE_HOST"))
 MAX_CHARS_PER_CHUNK = 1000
 TOP_K = 3
 
-def answer_query(query: str):
+def answer_query(query: str) -> str:
     results = index.search(
         namespace=os.getenv("PINECONE_NAMESPACE"),
         query={"inputs": {"text": query}, "top_k": TOP_K},
@@ -37,29 +43,10 @@ def answer_query(query: str):
 
     return response.output_text.strip()
 
-# Vercel serverless entrypoint
-def handler(request):
-    try:
-        data = json.loads(request.body.decode())
-        query = data.get("question", "")
-
-        if not query:
-            return {
-                "statusCode": 400,
-                "headers": {"Content-Type": "application/json"},
-                "body": json.dumps({"error": "Missing 'question' field"})
-            }
-
-        answer = answer_query(query)
-        return {
-            "statusCode": 200,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps({"answer": answer})
-        }
-
-    except Exception as e:
-        return {
-            "statusCode": 500,
-            "headers": {"Content-Type": "application/json"},
-            "body": json.dumps({"error": str(e)})
-        }
+@app.post("/api/thanatos")
+def thanatos(req: AskRequest):
+    q = req.question.strip()
+    if not q:
+        raise HTTPException(status_code=400, detail="Missing question")
+    answer = answer_query(q)
+    return {"answer": answer}
