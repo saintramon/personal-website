@@ -3,9 +3,6 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from openai import OpenAI
 from pinecone import Pinecone
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 class AskRequest(BaseModel):
